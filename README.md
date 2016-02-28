@@ -18,7 +18,6 @@ Z - South West
 E - North East   
 Q - North West   
 F - Flee   
-L - Attack   
 ; - Absorbtion   
 H - Healing [use potion you have most of] (in battle) / Hunting mode   
 N - Do Nothing(in battle) / Normal mode   
