@@ -4,7 +4,7 @@ Organized, eliminated redundancies, fixed broken features, added features, got r
 
 *****Remember to change NAMEHERE to your pet's name.******
 
-Note: tested only on NeoQuest I
+Note: tested only on NeoQuest I, on Chrome
 
 ---
 
