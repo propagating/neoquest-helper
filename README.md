@@ -26,16 +26,16 @@ P - Skill Points
 I - Items   
 M - Return to Map (useful on items/skills/when you level up)  
 
-The script also places two buttons in stats: Autobattle (on/off) and Trainer (on/off)
-Note: these functions enable automatic page loads, which is against neopets rules.
-Autobattle will, when in battle:
-  'do nothing' when stunned;
-  absorb whenever possible;
-  spirit of growth when possible and missing at least 60 life;
-  use whichever potion you have the most of when at or below half health;
-  attack, of course, otherwise;
-  skip start and end battle pages, except on a "new level" page.
-Trainer will:
-  move left and right until you tell it to stop;
-  switch to hunting when turned on;
-  switch to sneaking when turned off.
+The script also places two buttons in stats: Autobattle (on/off) and Trainer (on/off)  
+Note: these functions enable automatic page loads, which is against neopets rules.  
+Autobattle will, when in battle:  
+  'do nothing' when stunned;  
+  absorb whenever possible;  
+  spirit of growth when possible and missing at least 60 life;  
+  use whichever potion you have the most of when at or below half health;  
+  attack, of course, otherwise;  
+  skip start and end battle pages, except on a "new level" page.  
+Trainer will:  
+  move left and right until you tell it to stop;  
+  switch to hunting when turned on;  
+  switch to sneaking when turned off.  
