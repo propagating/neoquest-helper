@@ -13,7 +13,7 @@ var neoquest = document.body.innerHTML.split('NeoQuest is brought to you by')[1]
 if(neoquest.search('to start a new game in') == -1){ 
 
 	// set values
-	var petName = "NAMEHERE"; // set pet name for button placement
+	var petName = "sunraydapple"; // set pet name for button placement
 	var debug = false;
 	if(typeof GM_getValue("battle") === 'undefined'){
 		GM_setValue("battle",0);
@@ -36,8 +36,11 @@ if(neoquest.search('to start a new game in') == -1){
 	
 	// check if features are running and add appropriate links
 	switches("fighter","Autobattle"); // the fighter will battle automatically when on
-	switches("trainer","Trainer");      // the trainer will alternate going left and right on hunting mode when on
+	switches("trainer","Trainer");    // the trainer will alternate going left and right on hunting mode when on
 
+    // check if in or out of battle
+    updateBattle();
+    
 	// run autobattle!
 	if(GM_getValue("fighterRunning")){ 
 		if(debug){GM_log("RUNNING FIGHTER");}
@@ -136,8 +139,8 @@ if(neoquest.search('to start a new game in') == -1){
 			case 102: location.href = "javascript:setdata('flee',0);";
 			break;
 
-			// "m", return to map (use in items, skills)
-			case 109: location.href = "http://www.neopets.com/games/neoquest/neoquest.phtml";
+			// "m", start fight / end fight / return to map (use in items, skills)
+			case 109: if (finishFight()){ location.href = "http://www.neopets.com/games/neoquest/neoquest.phtml"; }  
 			}
 		});
 }
@@ -184,8 +187,36 @@ function switches(name, lable){
 	}
 }	
 
+function updateBattle(){  // seperate for keybinding reasons
+	// set battle to 1 when fight begins or when in a fight
+	if(neoquest.search('Do nothing') != -1 || neoquest.search('to begin the fight') != -1){
+		if(debug){GM_log("IN BATTLE");}
+		if(debug){GM_log("BATTLE WAS: " + GM_getValue("battle"));}
+		GM_setValue("battle",1);
+		if(debug){GM_log("BATTLE IS NOW: " + GM_getValue("battle"));}
+	}
+    	//set battle to 0 when fight is over 
+	else if(neoquest.search('for defeating this creature!') != -1 || neoquest.search('You escaped from') != -1){ 
+		GM_log("Battle over!");
+		if(debug){GM_log("BATTLE WAS: " + GM_getValue("battle"));}
+		GM_setValue("battle",0);
+		if(debug){GM_log("BATTLE IS NOW: " + GM_getValue("battle"));}
+	}		    
+}
+
+function finishFight(){  // seperate for keybinding reasons
+	if( (neoquest.search('for defeating this creature!') != -1 && neoquest.search('You gain a') == -1) || neoquest.search('You escaped from') != -1){ // skip end of battle page if NOT new level
+		GM_log("Exit fight");
+		var finishFight = $("input[value='Click here to return to the map']").parent();
+		finishFight.submit(); 
+		return false;
+	}   
+	return true;
+}
+
 function runFighter(neoquest){
 	if(GM_getValue("battle") == 0){     // not in a battle
+        finishFight();
 		if(GM_getValue("trainerRunning")){   
 			if(GM_getValue("goLeft")){ // go left
 				GM_setValue("goLeft", false);
@@ -205,6 +236,9 @@ function runFighter(neoquest){
 	}
 	else{ // in a battle
 		if(debug){GM_log("BATTLE DECISION TREE");}
+        if (neoquest.search('to begin the fight') != -1){
+            location.href = "http://www.neopets.com/games/neoquest/neoquest.phtml";
+        }
 		if ( (neoquest.search('stuns you for') != -1 || neoquest.search('You are stunned') != -1) && neoquest.search('Attack') == -1){
 			location.href = "javascript:setdata('noop', 0);";
 			if(debug){GM_log("STUNNED: doing nothing");}
@@ -230,27 +264,6 @@ function runFighter(neoquest){
 		}
 		GM_log("AUTOTRAINER: ATTACK");
 		setTimeout(function(){location.href = "javascript:setdata('attack', 0);";},Math.floor(Math.random()*1000+1000)); 
-	}
-
-	// set battle to 1 when fight begins or when in a fight
-	if(neoquest.search('Do nothing') != -1 || neoquest.search('to begin the fight') != -1){
-		if(debug){GM_log("IN BATTLE");}
-		if(debug){GM_log("BATTLE WAS: " + GM_getValue("battle"));}
-		GM_setValue("battle",1);
-		if(debug){GM_log("BATTLE IS NOW: " + GM_getValue("battle"));}
-		if (neoquest.search('to begin the fight') != -1) {
-			location.href = "http://www.neopets.com/games/neoquest/neoquest.phtml";
-		}
-	}
-	else if(neoquest.search('for defeating this creature!') != -1){ // the battle is over
-		GM_log("Battle over!");
-		if(debug){GM_log("BATTLE WAS: " + GM_getValue("battle"));}
-		GM_setValue("battle",0);
-		if(debug){GM_log("BATTLE IS NOW: " + GM_getValue("battle"));}
-		if(neoquest.search('You gain a') == -1){ // continue if NOT new level
-			var finishFight = $("input[value='Click here to return to the map']").parent();
-			finishFight.submit(); 
-		} 
 	}		
 }
 
