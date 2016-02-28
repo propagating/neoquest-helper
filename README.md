@@ -17,15 +17,15 @@ C - South East
 Z - South West   
 E - North East   
 Q - North West   
+L - Attack (in battle) / Action (Go!, confirm skills, or talk; whichever is applicable)  
 F - Flee   
 ; - Absorbtion   
-H - Healing [use potion you have most of] (in battle) / Hunting mode   
+H - Healing: use potion you have most of (in battle) / Hunting mode   
 N - Do Nothing(in battle) / Normal mode   
 J - Sneaking mode   
-L - Action (Go!, confirm skills, or talk; whichever is applicable)  
 P - Skill Points   
 I - Items   
-M - Return to Map (useful on items/skills/when you level up)  
+M - Enter battle / Exit battle / Return to Map (useful in items/skills)  
 
 ---
 
