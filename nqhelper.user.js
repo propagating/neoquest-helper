@@ -6,7 +6,7 @@
 // @include	http://www.neopets.com/quickref.phtml*
 // @require	http://code.jquery.com/jquery-latest.min.js
 // ==/UserScript==
-//debugger;
+
 var neoquest = document.body.innerHTML.split('NeoQuest is brought to you by')[1];
 
 // if a game is in progress, run the script
@@ -94,12 +94,12 @@ if(neoquest.search('to start a new game in') == -1){
 			case 99:	moveDirection(8);
 			break;
 
-			// "n", normal
+			// "n", do nothing / normal
 			case 110:	if(GM_getValue("battle") == 1){location.href = "javascript:setdata('noop', 0);";}else{walkingMode(1);}
 			break;
 
-			// "h", hunting
-			case 104:	walkingMode(2);
+			// "h", heal / hunting
+			case 104:	if(GM_getValue("battle") == 1){pickPotion();}else{walkingMode(2);}
 			break;
 
 			// "j", sneaking
@@ -172,7 +172,7 @@ function switches(name, lable){
 		$("#"+id2).click(
 			function(){
 				if(name == "fighter"){
-					var runUntil = prompt("Run until what level?",Number(level) + 1); //where does level come from??????????????
+					var runUntil = prompt("Run until what level?",Number(level) + 1); 
 					GM_setValue("runUntil",Number(runUntil));
 					GM_log("fighterEnds: " + GM_getValue("runUntil"));
 				}
@@ -223,7 +223,7 @@ function runFighter(neoquest){
 				if(debug){GM_log("USING POTION");}
 			} 
 		}
-		else if(GM_getValue("level") >= GM_getValue("runUntil")){ // why is this here?????????????????????????
+		else if(GM_getValue("level") >= GM_getValue("runUntil")){ 
 			GM_log("leveled up. fighter killed!");
 			GM_setValue("fighterRunning",false);
 			alert("runUntil level reached");
