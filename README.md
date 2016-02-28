@@ -6,6 +6,7 @@ Organized, eliminated redundancies, fixed broken features, added features, got r
 
 Note: tested only on NeoQuest I
 
+
 Keybindings:  
 W - North   
 A - West   
@@ -25,6 +26,7 @@ L - Action (Go!, confirm skills, or talk; whichever is applicable)
 P - Skill Points   
 I - Items   
 M - Return to Map (useful on items/skills/when you level up)  
+
 
 The script also places two buttons in stats: Autobattle (on/off) and Trainer (on/off)  
 Note: these functions enable automatic page loads, which is against neopets rules.  
