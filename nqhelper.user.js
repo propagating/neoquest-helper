@@ -1,7 +1,6 @@
 // ==UserScript==
 // @name        Neoquest Helper
 // @description Autofights and/or moves back and forth
-// @namespace	userscripts.org
 // @include	http://www.neopets.com/games/neoquest/*
 // @include	http://www.neopets.com/quickref.phtml*
 // @require	http://code.jquery.com/jquery-latest.min.js
@@ -37,10 +36,10 @@ if(neoquest.search('to start a new game in') == -1){
 	// check if features are running and add appropriate links
 	switches("fighter","Autobattle"); // the fighter will battle automatically when on
 	switches("trainer","Trainer");    // the trainer will alternate going left and right on hunting mode when on
-
-    // check if in or out of battle
-    updateBattle();
     
+    	// check if in or out of battle
+	updateBattle();
+	
 	// run autobattle!
 	if(GM_getValue("fighterRunning")){ 
 		if(debug){GM_log("RUNNING FIGHTER");}
@@ -62,7 +61,29 @@ if(neoquest.search('to start a new game in') == -1){
 			if(debug){GM_log("TALK: " + talk);}
 		}
 	}
+    
+	// enables arrow keys... pretty useless, really, since there's no diagonals, but you have the option
+	$(document).keydown(function(e) {
+		switch(e.which){	
+			// left arrow, west
+			case 37:	moveDirection(4);
+			break;		
+			
+			// up arrow, north 
+			case 38:	moveDirection(2);
+			break;
+
+			// right arrow, east
+			case 39:	moveDirection(5);
+			break;
+
+			// down arrow, south
+			case 40:	moveDirection(7);		
+			break;
+		}
+	});	
 	
+	// keybindings
 	$(document).keypress(function(e){
 		switch(e.which){	
 			// "q", north west
@@ -141,32 +162,25 @@ if(neoquest.search('to start a new game in') == -1){
 
 			// "m", start fight / end fight / return to map (use in items, skills)
 			case 109: if (finishFight()){ location.href = "http://www.neopets.com/games/neoquest/neoquest.phtml"; }  
-			}
-		});
+		}
+	});
 }
 
 function switches(name, lable){
 	var run = name+"Running";
 	var id1 = name+"False";
 	var id2 = name+"True";
-	var url1;
-	var url2;
-	if(name == "fighter"){
-		url1 = "http://www.neopets.com/games/neoquest/neoquest.phtml";
-		url2 = url1;
-	}
-	else{
-		url1 = "http://www.neopets.com/games/neoquest/neoquest.phtml?movetype=3";
-		url2 = "http://www.neopets.com/games/neoquest/neoquest.phtml?movetype=2";
-	}
 	if(GM_getValue(run)){ // GM functions are used to persist simple values accross page loads
 		$(".content b:contains('" + petName + "'):first").after(" | "+lable+": <a href='#' id='"+id1+"'><b>On</b></a>"); // write button to page
 		$("#"+id1).click(
 			function(){
-				if(name == "fighter"){ GM_setValue(run,false); }
 				GM_setValue("trainerRunning",false); // if fighter is turned off, we want trainer off too
 				if(debug){GM_log(name+" turned off");}
-				location.href = url1; // refresh the page to move on
+				if(name == "fighter"){ 
+		                    GM_setValue(run,false); 
+		                    location.href = "http://www.neopets.com/games/neoquest/neoquest.phtml"; // refresh the page to move on
+		                }
+		                else{ walkingMode(3); }
 			}
 		);
 	}
@@ -174,18 +188,30 @@ function switches(name, lable){
 		$(".content b:contains('" + petName + "'):first").after(" | "+lable+": <a href='#' id='"+id2+"'><b>Off</b></a>"); 
 		$("#"+id2).click(
 			function(){
+				if(debug){GM_log(run+": " + GM_getValue(run));}
+                GM_setValue("fighterRunning",true);
+				if(debug){GM_log(run+": " + GM_getValue(run));}
 				if(name == "fighter"){
-					var runUntil = prompt("Run until what level?",Number(level) + 1); 
+					location.href = "http://www.neopets.com/games/neoquest/neoquest.phtml"; // refresh the page to move on
+				}
+                else{ 
+                    GM_setValue(run,true);
+                    var runUntil = prompt("Run until what level?",Number(level) + 1); 
 					GM_setValue("runUntil",Number(runUntil));
 					GM_log("fighterEnds: " + GM_getValue("runUntil"));
-				}
-				GM_setValue(run,true);
-				if(debug){GM_log(run+": " + GM_getValue(run));}
-				location.href = url2; 
+                    walkingMode(2); 
+                }
 			}
 		);
 	}
-}	
+    if(GM_getValue("trainerRunning") && (GM_getValue("level") >= GM_getValue("runUntil"))){ 
+        GM_log("leveled up. trainer killed!");
+        GM_setValue("trainerRunning",false);
+        alert("level reached");
+    }
+}
+
+
 
 function updateBattle(){  // seperate for keybinding reasons
 	// set battle to 1 when fight begins or when in a fight
@@ -195,7 +221,7 @@ function updateBattle(){  // seperate for keybinding reasons
 		GM_setValue("battle",1);
 		if(debug){GM_log("BATTLE IS NOW: " + GM_getValue("battle"));}
 	}
-    	//set battle to 0 when fight is over 
+    //set battle to 0 when fight is over 
 	else if(neoquest.search('for defeating this creature!') != -1 || neoquest.search('You escaped from') != -1){ 
 		GM_log("Battle over!");
 		if(debug){GM_log("BATTLE WAS: " + GM_getValue("battle"));}
@@ -205,18 +231,18 @@ function updateBattle(){  // seperate for keybinding reasons
 }
 
 function finishFight(){  // seperate for keybinding reasons
-	if( (neoquest.search('for defeating this creature!') != -1 && neoquest.search('You gain a') == -1) || neoquest.search('You escaped from') != -1){ // skip end of battle page if NOT new level
-		GM_log("Exit fight");
-		var finishFight = $("input[value='Click here to return to the map']").parent();
-		finishFight.submit(); 
-		return false;
-	}   
-	return true;
+    if( (neoquest.search('for defeating this creature!') != -1 && neoquest.search('You gain a') == -1) || neoquest.search('You escaped from') != -1){ // skip end of battle page if NOT new level
+        GM_log("Exit fight");
+        var finishFight = $("input[value='Click here to return to the map']").parent();
+        finishFight.submit(); 
+        return false;
+    }   
+    return true;
 }
 
 function runFighter(neoquest){
 	if(GM_getValue("battle") == 0){     // not in a battle
-        finishFight();
+        if(finishFight()){ GM_log("autoexit battle"); }
 		if(GM_getValue("trainerRunning")){   
 			if(GM_getValue("goLeft")){ // go left
 				GM_setValue("goLeft", false);
@@ -256,11 +282,6 @@ function runFighter(neoquest){
 				pickPotion(); 
 				if(debug){GM_log("USING POTION");}
 			} 
-		}
-		else if(GM_getValue("level") >= GM_getValue("runUntil")){ 
-			GM_log("leveled up. fighter killed!");
-			GM_setValue("fighterRunning",false);
-			alert("runUntil level reached");
 		}
 		GM_log("AUTOTRAINER: ATTACK");
 		setTimeout(function(){location.href = "javascript:setdata('attack', 0);";},Math.floor(Math.random()*1000+1000)); 
