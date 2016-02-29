@@ -33,7 +33,7 @@ M - Enter battle / Exit battle / Return to Map (useful in items/skills)
 ---
 
 The script also places two buttons in stats: Autobattle (on/off) and Trainer (on/off)  
-Note: these functions enable automatic page loads, which is against neopets rules.  
+**NOTE: These functions enable automatic page loads, which is against neopets rules.  Don't leave on for a ridiculous number of hours, and you probably shouldn't do anything else on neopets while it's running. Read a book or something.**
 
 Autobattle will (in battle):  
  - 'do nothing' when stunned;  
