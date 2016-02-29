@@ -8,7 +8,8 @@ Note: tested only on NeoQuest I, on Chrome
 
 ---
 
-Keybindings:  
+Keybindings:     
+arrow keys - North, West, South, East    
 W - North   
 A - West   
 S - South   
