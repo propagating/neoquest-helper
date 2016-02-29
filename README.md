@@ -42,6 +42,7 @@ Autobattle will (in battle):
  - skip start and end battle pages, except on a "new level" page.  
 
 Trainer will (not in battle):  
- - move left and right until you tell it to stop;  
- - switch to hunting when turned on;  
+ - move left and right until termination;  
+ - switch to hunting and ask what level to train to when turned on;  
+ - turn off when level specified is reached;
  - switch to sneaking when turned off.  
