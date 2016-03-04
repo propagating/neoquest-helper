@@ -1,6 +1,7 @@
 // ==UserScript==
-// @name        Neoquest Helper
+// @name        Neopets - Neoquest I Helper
 // @description Autofights and/or moves back and forth
+// @namespace	github.com/friendly-trenchcoat
 // @include	http://www.neopets.com/games/neoquest/*
 // @include	http://www.neopets.com/quickref.phtml*
 // @require	http://code.jquery.com/jquery-latest.min.js
@@ -12,7 +13,7 @@ var neoquest = document.body.innerHTML.split('NeoQuest is brought to you by')[1]
 if(neoquest.search('to start a new game in') == -1){ 
 
 	// set values
-	var petName = "NAMEHERE"; // set pet name for button placement
+	var petName = "sunraydapple"; // set pet name for button placement
 	var debug = false;
 	if(typeof GM_getValue("battle") === 'undefined'){
 		GM_setValue("battle",0);
@@ -37,10 +38,10 @@ if(neoquest.search('to start a new game in') == -1){
 	switches("fighter","Autobattle"); // the fighter will battle automatically when on
 	switches("trainer","Trainer");    // the trainer will alternate going left and right on hunting mode when on
     
-    	// check if in or out of battle
-	updateBattle();
-	
-	// run autobattle!
+    // check if in or out of battle
+    updateBattle();
+    
+    // run autobattle!
 	if(GM_getValue("fighterRunning")){ 
 		if(debug){GM_log("RUNNING FIGHTER");}
 		runFighter(neoquest); 
@@ -62,8 +63,8 @@ if(neoquest.search('to start a new game in') == -1){
 		}
 	}
     
-	// enables arrow keys... pretty useless, really, since there's no diagonals, but you have the option
-	$(document).keydown(function(e) {
+    // enables arrow keys... pretty useless, really, since there's no diagonals, but you have the option
+    $(document).keydown(function(e) {
 		switch(e.which){	
 			// left arrow, west
 			case 37:	moveDirection(4);
@@ -80,10 +81,10 @@ if(neoquest.search('to start a new game in') == -1){
 			// down arrow, south
 			case 40:	moveDirection(7);		
 			break;
-		}
-	});	
-	
-	// keybindings
+        }
+    });	
+    
+    // keybindings
 	$(document).keypress(function(e){
 		switch(e.which){	
 			// "q", north west
@@ -162,8 +163,8 @@ if(neoquest.search('to start a new game in') == -1){
 
 			// "m", start fight / end fight / return to map (use in items, skills)
 			case 109: if (finishFight()){ location.href = "http://www.neopets.com/games/neoquest/neoquest.phtml"; }  
-		}
-	});
+        }
+    });
 }
 
 function switches(name, lable){
@@ -177,13 +178,13 @@ function switches(name, lable){
 				GM_setValue("trainerRunning",false); // if fighter is turned off, we want trainer off too
 				if(debug){GM_log(name+" turned off");}
 				if(name == "fighter"){ 
-		                    GM_setValue(run,false); 
-		                    location.href = "http://www.neopets.com/games/neoquest/neoquest.phtml"; // refresh the page to move on
-		                }
-		                else{ walkingMode(3); }
+                    GM_setValue(run,false); 
+                    location.href = "http://www.neopets.com/games/neoquest/neoquest.phtml"; // refresh the page to move on
+                }
+                else{ walkingMode(3); }
 			}
 		);
-	}
+    }
 	else{
 		$(".content b:contains('" + petName + "'):first").after(" | "+lable+": <a href='#' id='"+id2+"'><b>Off</b></a>"); 
 		$("#"+id2).click(
@@ -204,11 +205,6 @@ function switches(name, lable){
 			}
 		);
 	}
-    if(GM_getValue("trainerRunning") && (GM_getValue("level") >= GM_getValue("runUntil"))){ 
-        GM_log("leveled up. trainer killed!");
-        GM_setValue("trainerRunning",false);
-        alert("level reached");
-    }
 }
 
 
@@ -236,7 +232,12 @@ function finishFight(){  // seperate for keybinding reasons
         var finishFight = $("input[value='Click here to return to the map']").parent();
         finishFight.submit(); 
         return false;
-    }   
+    }
+    else if(GM_getValue("trainerRunning") && (GM_getValue("level") >= GM_getValue("runUntil"))){ 
+        GM_log("leveled up. trainer killed!");
+        GM_setValue("trainerRunning",false);
+        alert("level reached");
+    }    
     return true;
 }
 
@@ -338,19 +339,19 @@ function pickPotion(){
 	// 5   220005 is Spirit Healing Potion    
 	var nameList = ['Wea','Sta', 'Str', 'Gre', 'Sup', 'Spi'];
 	var name;
-    var ind;
-    var quantity;
+	var ind;
+	var quantity;
 	var largestQ = 0;
-    var use;
-    debugger;
-    $("a[onclick*='item']").each(function(k,v) {
+	var use;
+	debugger;
+	$("a[onclick*='item']").each(function(k,v) {
 		name = v.innerHTML.match(/Use a (...)/)[1]; // finds the first three characters after "Use a "
-        index = nameList.indexOf(name);
-        quantity = v.innerHTML.match(/([0-9,\,]+) left/)[1]; // finds the number before " left"
+	        ind = nameList.indexOf(name);
+	        quantity = v.innerHTML.match(/([0-9,\,]+) left/)[1]; // finds the number before " left"
 		if(quantity > largestQ){ 
-            largestQ = quantity; 
-            use = index;
-        }
+			largestQ = quantity; 
+			use = ind;
+	        }
 	});    
 	location.href = "javascript:setdata('item', 22000"+use+");";   
 }
