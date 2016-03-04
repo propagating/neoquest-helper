@@ -343,7 +343,6 @@ function pickPotion(){
 	var quantity;
 	var largestQ = 0;
 	var use;
-	debugger;
 	$("a[onclick*='item']").each(function(k,v) {
 		name = v.innerHTML.match(/Use a (...)/)[1]; // finds the first three characters after "Use a "
 	        ind = nameList.indexOf(name);
