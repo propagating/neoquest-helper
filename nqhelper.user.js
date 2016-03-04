@@ -1,6 +1,7 @@
 // ==UserScript==
 // @name        Neopets - Neoquest I Helper
-// @description Autofights and/or moves back and forth
+// @author	freindly-trenchcoat
+// @description Adds keybindings; Autofights and/or moves back and forth
 // @namespace	github.com/friendly-trenchcoat
 // @include	http://www.neopets.com/games/neoquest/*
 // @include	http://www.neopets.com/quickref.phtml*
