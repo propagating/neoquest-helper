@@ -330,18 +330,27 @@ function printXP() {
 	
 };
 function pickPotion(){
-	// 1   220000 is Weak Healing Potion
-	// 2   220001 is Standard Healing Potion
-	// 3   220002 is Strong Healing Potion
-	// 4   220003 is Greater Healing Potion
-	// 5   220004 is Superior Healing Potion
-	// 6   220005 is Spirit Healing Potion    
-	var quantity;
+	// 0   220000 is Weak Healing Potion
+	// 1   220001 is Standard Healing Potion
+	// 2   220002 is Strong Healing Potion
+	// 3   220003 is Greater Healing Potion
+	// 4   220004 is Superior Healing Potion
+	// 5   220005 is Spirit Healing Potion    
+	var nameList = ['Wea','Sta', 'Str', 'Gre', 'Sup', 'Spi'];
+	var name;
+    var ind;
+    var quantity;
 	var largestQ = 0;
-	var ids = [220000, 220001, 220002, 220003, 220004, 220005];
-	$("a[onclick*='item']").each(function(k,v) {
-		quantity = v.innerHTML.match(/([0-9,\,]+) left/)[1];
-		if(quantity > largestQ){ largestQ = k; }
+    var use;
+    debugger;
+    $("a[onclick*='item']").each(function(k,v) {
+		name = v.innerHTML.match(/Use a (...)/)[1]; // finds the first three characters after "Use a "
+        index = nameList.indexOf(name);
+        quantity = v.innerHTML.match(/([0-9,\,]+) left/)[1]; // finds the number before " left"
+		if(quantity > largestQ){ 
+            largestQ = quantity; 
+            use = index;
+        }
 	});    
-	location.href = "javascript:setdata('item', "+ids[largestQ-1]+");";   
+	location.href = "javascript:setdata('item', 22000"+use+");";   
 }
