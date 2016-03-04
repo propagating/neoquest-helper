@@ -13,7 +13,7 @@ var neoquest = document.body.innerHTML.split('NeoQuest is brought to you by')[1]
 if(neoquest.search('to start a new game in') == -1){ 
 
 	// set values
-	var petName = "sunraydapple"; // set pet name for button placement
+	var petName = "NAMEHERE"; // set pet name for button placement
 	var debug = false;
 	if(typeof GM_getValue("battle") === 'undefined'){
 		GM_setValue("battle",0);
