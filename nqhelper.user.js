@@ -14,10 +14,13 @@ var potionAt = 0.5; // Use potion at half life; feel free to change
 if(neoquest.search('to start a new game in') == -1){ 
 
 	// set values
-	var petName = "PETNAMEHERE"; // set pet name for button placement
+	var petName = "NAMEHERE"; // set pet name for button placement
 	var debug = false;
 	if(typeof GM_getValue("battle") === 'undefined'){
 		GM_setValue("battle",0);
+	}
+    if(typeof GM_getValue("goLeft") === 'undefined'){
+		GM_setValue("goLeft", true);
 	}
 
 	// find and record stats
@@ -228,22 +231,20 @@ function updateBattle(){  // seperate for keybinding reasons
 }
 
 function finishFight(){  // seperate for keybinding reasons
-    if( (neoquest.search('for defeating this creature!') != -1 && neoquest.search('You gain a') == -1) || neoquest.search('You escaped from') != -1){ // skip end of battle page if NOT new level
-        GM_log("Exit fight");
-        var finishFight = $("input[value='Click here to return to the map']").parent();
-        finishFight.submit(); 
-    }
-    else if(neoquest.search('You gain a') != -1){ 
+    if(neoquest.search('You gain a') != -1 && GM_getValue("trainerRunning") && GM_getValue("level") >= GM_getValue("runUntil")-1){ 
         if(debug){
             GM_log("LEVEL UP FROM: " + GM_getValue("level"));
             GM_log("TRAIN UNTIL: " + GM_getValue("runUntil"));
         }
-        if (GM_getValue("trainerRunning") && GM_getValue("level") >= GM_getValue("runUntil")-1){
-            GM_log("trainer killed");
-            GM_setValue("trainerRunning",false);
-        }
+        GM_log("trainer killed");
+        GM_setValue("trainerRunning",false);
         return false;
     }    
+    else if (neoquest.search('for defeating this creature!') != -1 || neoquest.search('You escaped from') != -1){ // skip end of battle page 
+        GM_log("Exit fight");
+        var finishFight = $("input[value='Click here to return to the map']").parent();
+        finishFight.submit(); 
+    }
 }
 
 function runFighter(neoquest){
