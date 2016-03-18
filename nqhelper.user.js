@@ -1,7 +1,6 @@
 // ==UserScript==
 // @name        Neopets - Neoquest I Helper
-// @author	freindly-trenchcoat
-// @description Adds keybindings; Autofights and/or moves back and forth
+// @description Autofights and/or moves back and forth
 // @namespace	github.com/friendly-trenchcoat
 // @include	http://www.neopets.com/games/neoquest/*
 // @include	http://www.neopets.com/quickref.phtml*
@@ -9,12 +8,13 @@
 // ==/UserScript==
 
 var neoquest = document.body.innerHTML.split('NeoQuest is brought to you by')[1];
+var potionAt = 0.5; // Use potion at half life; feel free to change
 
 // if a game is in progress, run the script
 if(neoquest.search('to start a new game in') == -1){ 
 
 	// set values
-	var petName = "NAMEHERE"; // set pet name for button placement
+	var petName = "PETNAMEHERE"; // set pet name for button placement
 	var debug = false;
 	if(typeof GM_getValue("battle") === 'undefined'){
 		GM_setValue("battle",0);
@@ -50,7 +50,7 @@ if(neoquest.search('to start a new game in') == -1){
 
 	// actions for keybinding "l"
 	if(GM_getValue("battle") == 0){
-		if (neoquest.search('Go!') != -1) {
+		if (neoquest.search('Go!') != -1 && neoquest.search('You see') != -1) {
 			var go = $(".phpGamesNonPortalView a:contains('Go!')").attr("href");
 			if(debug){GM_log("GO: " + go);}
 		}
@@ -232,40 +232,46 @@ function finishFight(){  // seperate for keybinding reasons
         GM_log("Exit fight");
         var finishFight = $("input[value='Click here to return to the map']").parent();
         finishFight.submit(); 
-        return false;
     }
-    else if(GM_getValue("trainerRunning") && (GM_getValue("level") >= GM_getValue("runUntil"))){ 
-        GM_log("leveled up. trainer killed!");
-        GM_setValue("trainerRunning",false);
-        alert("level reached");
+    else if(neoquest.search('You gain a') != -1){ 
+        if(debug){
+            GM_log("LEVEL UP FROM: " + GM_getValue("level"));
+            GM_log("TRAIN UNTIL: " + GM_getValue("runUntil"));
+        }
+        if (GM_getValue("trainerRunning") && GM_getValue("level") >= GM_getValue("runUntil")-1){
+            GM_log("trainer killed");
+            GM_setValue("trainerRunning",false);
+        }
+        return false;
     }    
-    return true;
 }
 
 function runFighter(neoquest){
 	if(GM_getValue("battle") == 0){     // not in a battle
-        if(finishFight()){ GM_log("autoexit battle"); }
-		if(GM_getValue("trainerRunning")){   
-			if(GM_getValue("goLeft")){ // go left
-				GM_setValue("goLeft", false);
-				if(debug){GM_log("TRAINER LEFT");}
-				setTimeout(function(){location.href = "http://www.neopets.com/games/neoquest/neoquest.phtml?action=move&movedir=4";},Math.floor(Math.random()*1000+1000)); // makes it look less fake?
-			}
-			else{ // go right
-				GM_setValue("goLeft", true);
-				if(debug){GM_log("TRAINER RIGHT");}
-				setTimeout(function(){location.href = "http://www.neopets.com/games/neoquest/neoquest.phtml?action=move&movedir=5";},Math.floor(Math.random()*1000+1000));
-			}
-			if(debug){
-				GM_log("TRAINER: " + GM_getValue("fighterRunning"));
-				GM_log("BATTLE: " + GM_getValue("battle"));
-			}
-		} // if not in a battle, but trainer is not on, do nothing
+        if(finishFight() != false){ 
+            if(GM_getValue("trainerRunning")){   
+                if(GM_getValue("goLeft")){ // go left
+                    GM_setValue("goLeft", false);
+                    if(debug){GM_log("TRAINER LEFT");}
+                    setTimeout(function(){location.href = "http://www.neopets.com/games/neoquest/neoquest.phtml?action=move&movedir=4";},Math.floor(Math.random()*1000+1000)); // makes it look less fake?
+                }
+                else{ // go right
+                    GM_setValue("goLeft", true);
+                    if(debug){GM_log("TRAINER RIGHT");}
+                    setTimeout(function(){location.href = "http://www.neopets.com/games/neoquest/neoquest.phtml?action=move&movedir=5";},Math.floor(Math.random()*1000+1000));
+                }
+                if(debug){
+                    GM_log("TRAINER: " + GM_getValue("fighterRunning"));
+                    GM_log("BATTLE: " + GM_getValue("battle"));
+                }
+            } // if not in a battle and not new level, but trainer is not on, do nothing
+        }// if not in a battle, but new level, do nothing
 	}
 	else{ // in a battle
 		if(debug){GM_log("BATTLE DECISION TREE");}
         if (neoquest.search('to begin the fight') != -1){
             location.href = "http://www.neopets.com/games/neoquest/neoquest.phtml";
+            if(debug){GM_log("BEGIN FIGHT");}
         }
 		if ( (neoquest.search('stuns you for') != -1 || neoquest.search('You are stunned') != -1) && neoquest.search('Attack') == -1){
 			location.href = "javascript:setdata('noop', 0);";
@@ -275,16 +281,14 @@ function runFighter(neoquest){
 			location.href = "javascript:setdata('special', 4003);";
 			if(debug){GM_log("CASTING ABSORPTION");}
 		}
-		else if(Number(GM_getValue("health")) < Number(GM_getValue("maxHealth")-60)){ // 'Spirit of Growth' heals 100, so make it 60 to be safe
-			if(neoquest.search('Spirit') != -1){ 
+		else if(neoquest.search('Spirit') != -1 && Number(GM_getValue("health")) < Number(GM_getValue("maxHealth")-60)){ // 'Spirit of Growth' heals 100, so make it 60 to be safe
 				setTimeout(function(){location.href = "javascript:setdata('special', 200019);";},Math.floor(Math.random()*1000+1000));
 				if(debug){GM_log("CASTING Spirit of Growth");}
-			}  
-			else if(Number(GM_getValue("health")) < Number(GM_getValue("maxHealth")/2)){ // if there's no SoG, wait till half life to use a potion
-				pickPotion(); 
-				if(debug){GM_log("USING POTION");}
-			} 
-		}
+        }  
+        else if(Number(GM_getValue("health")) < Number(GM_getValue("maxHealth")*potionAt)){ // if there's no SoG, wait till half life (or whatever user decided) to use a potion
+            pickPotion(); 
+            if(debug){GM_log("USING POTION");}
+        } 
 		GM_log("AUTOTRAINER: ATTACK");
 		setTimeout(function(){location.href = "javascript:setdata('attack', 0);";},Math.floor(Math.random()*1000+1000)); 
 	}		
@@ -324,7 +328,7 @@ function printXP() {
 	var xpTable = ['0', '600', '1,400', '2,400', '3,400', '4,500', '5,600','6,800', '8,000', '9,300', '10,600', '12,000', '13,400', '14,900','16,400', '18,000', '19,600', '21,300', '23,100', '25,000', '27,000','29,000', '31,000', '33,000', '35,000', '37,000', '39,000', '41,000','43,000', '45,000', '48,000', '51,000', '54,000', '57,000', '60,000','63,000', '66,000', '69,000', '72,000', '75,000', '79,000','83,000', '87,000', '91,000', '95,000', '99,000', '103,000','107,000', '112,000', '117,000','MAX'];
 	var levelSplit = neoquest.split('Level: <b>')[1];
 	var level = levelSplit.split('</b>',1)[0];
-	var currentXP = $(".phpGamesNonPortalView b:eq(5)").text();
+	var currentXP = $(".phpGamesNonPortalView b:eq(4)").text();
 	if(debug){GM_log("EXP: " + currentXP + "/" + xpTable[level]);}
 	if(level != 50){
 		$(".phpGamesNonPortalView b:eq(4)").append("/" + xpTable[level]);
@@ -340,18 +344,18 @@ function pickPotion(){
 	// 5   220005 is Spirit Healing Potion    
 	var nameList = ['Wea','Sta', 'Str', 'Gre', 'Sup', 'Spi'];
 	var name;
-	var ind;
-	var quantity;
+    var ind;
+    var quantity;
 	var largestQ = 0;
-	var use;
-	$("a[onclick*='item']").each(function(k,v) {
+    var use;
+    $("a[onclick*='item']").each(function(k,v) {
 		name = v.innerHTML.match(/Use a (...)/)[1]; // finds the first three characters after "Use a "
-	        ind = nameList.indexOf(name);
-	        quantity = v.innerHTML.match(/([0-9,\,]+) left/)[1]; // finds the number before " left"
+        index = nameList.indexOf(name);
+        quantity = v.innerHTML.match(/([0-9,\,]+) left/)[1]; // finds the number before " left"
 		if(quantity > largestQ){ 
-			largestQ = quantity; 
-			use = ind;
-	        }
+            largestQ = quantity; 
+            use = index;
+        }
 	});    
 	location.href = "javascript:setdata('item', 22000"+use+");";   
 }
